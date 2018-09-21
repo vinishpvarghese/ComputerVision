@@ -2,14 +2,27 @@
 
 import cv2
 import time
+from datetime import datetime
 
 face_cascade = cv2.CascadeClassifier('haar_frontalface.xml') # We load the cascade for the face.
 eye_cascade = cv2.CascadeClassifier('haar_eye.xml') # We load the cascade for the eyes.
 smile_cascade = cv2.CascadeClassifier('haar_smile.xml') # We load the cascade for the eyes.
 
+
+
+def writeData(): # We write the date and time of the face detection to a file for Analytics purpose   
+    with open('Detection.log', 'a') as file:
+        file.write('Face Detection Recorded at: %s\n' %datetime.now())
+
 def detect(gray, frame): # We create a function that takes as input the image in black and white (gray) and the original image (frame), and that will return the same image with the detector rectangles. 
     faces = face_cascade.detectMultiScale(gray, 1.3, 5) # We apply the detectMultiScale method from the face cascade to locate one or several faces in the image.
+    
+#    if faces is None:
+#        print("No Face detected ")
+#    else:
+#        writeData()
     for (x, y, w, h) in faces: # For each detected face:
+        writeData() # if face detected log the date and time of face detection 
         cv2.rectangle(frame, (x, y), (x+w, y+h), (255, 0, 0), 2) # We paint a rectangle around the face.
         roi_gray = gray[y:y+h, x:x+w] # We get the region of interest in the black and white image.
         roi_color = frame[y:y+h, x:x+w] # We get the region of interest in the colored image.
@@ -71,7 +84,6 @@ def getfps():
     video.release()
     
     return fps
-
 
 fps = getfps() # We find the frames per second 
 video_capture = cv2.VideoCapture(0) # We turn the webcam on.
